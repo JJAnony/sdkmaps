@@ -8,6 +8,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.sdkmapsgoogle.databinding.ActivityMapsBinding;
@@ -33,8 +34,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        LatLng ibirapuera = new LatLng(-23.587097, -46.657635);
+        mMap.addMarker(new MarkerOptions().position(ibirapuera).title("Marker in Ibirapuera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ibirapuera, 15));
+
+        LatLng car = new LatLng(-23.587657, -46.663010);
+        mMap.addMarker(new MarkerOptions().position(car).title("Marker in Car").icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
     }
 }
