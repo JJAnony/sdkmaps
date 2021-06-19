@@ -3,6 +3,7 @@ package com.example.sdkmapsgoogle;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,11 +37,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker in Car").icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
+            }
+        });
+
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Toast.makeText(MapsActivity.this, "Lat:" + latLng.latitude + " long:" + latLng.longitude, Toast.LENGTH_LONG).show();
+            }
+        });
+
         LatLng ibirapuera = new LatLng(-23.587097, -46.657635);
         mMap.addMarker(new MarkerOptions().position(ibirapuera).title("Marker in Ibirapuera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ibirapuera, 15));
-
-        LatLng car = new LatLng(-23.587657, -46.663010);
-        mMap.addMarker(new MarkerOptions().position(car).title("Marker in Car").icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
     }
 }
