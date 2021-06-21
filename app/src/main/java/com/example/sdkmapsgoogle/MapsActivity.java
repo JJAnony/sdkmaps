@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.sdkmapsgoogle.databinding.ActivityMapsBinding;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -49,6 +51,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         options.fillColor(Color.argb(126,255, 255, 0));
         mMap.addCircle(options);
 
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.add(new LatLng(-23.583311, -46.658743));
+        polygonOptions.add(new LatLng(-23.584173, -46.659891));
+        polygonOptions.add(new LatLng(-23.584503, -46.659607));
+        polygonOptions.add(new LatLng(-23.583635, -46.658455));
+        polygonOptions.strokeWidth(0);
+        polygonOptions.fillColor(Color.argb(126,255, 255, 255));
+        mMap.addPolygon(polygonOptions);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -59,7 +70,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                Toast.makeText(MapsActivity.this, "Lat:" + latLng.latitude + " long:" + latLng.longitude, Toast.LENGTH_LONG).show();
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.add(new LatLng(-23.588945, -46.660781));
+                polylineOptions.add(latLng);
+                polylineOptions.color(Color.BLACK);
+                polylineOptions.width(10);
+                mMap.addPolyline(polylineOptions);
             }
         });
 
