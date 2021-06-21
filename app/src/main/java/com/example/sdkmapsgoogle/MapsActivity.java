@@ -2,6 +2,7 @@ package com.example.sdkmapsgoogle;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -10,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.sdkmapsgoogle.databinding.ActivityMapsBinding;
@@ -37,6 +39,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+        LatLng ibirapuera = new LatLng(-23.587097, -46.657635);
+        mMap.addMarker(new MarkerOptions().position(ibirapuera).title("Marker in Ibirapuera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+
+        CircleOptions options = new CircleOptions();
+        options.center(ibirapuera);
+        options.radius(150);
+        options.strokeWidth(0);
+        options.fillColor(Color.argb(126,255, 255, 0));
+        mMap.addCircle(options);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -51,8 +63,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        LatLng ibirapuera = new LatLng(-23.587097, -46.657635);
-        mMap.addMarker(new MarkerOptions().position(ibirapuera).title("Marker in Ibirapuera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ibirapuera, 15));
     }
 }
