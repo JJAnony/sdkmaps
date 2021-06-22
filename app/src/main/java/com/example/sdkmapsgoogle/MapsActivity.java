@@ -1,8 +1,18 @@
 package com.example.sdkmapsgoogle;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -22,6 +32,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private String[] permissions = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+    private LocationManager locationManager;
+    private LocationListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,55 +45,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        Permissions.valid(permissions, this, 1);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        LatLng ibirapuera = new LatLng(-23.587097, -46.657635);
-        mMap.addMarker(new MarkerOptions().position(ibirapuera).title("Marker in Ibirapuera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-
-        CircleOptions options = new CircleOptions();
-        options.center(ibirapuera);
-        options.radius(150);
-        options.strokeWidth(0);
-        options.fillColor(Color.argb(126,255, 255, 0));
-        mMap.addCircle(options);
-
-        PolygonOptions polygonOptions = new PolygonOptions();
-        polygonOptions.add(new LatLng(-23.583311, -46.658743));
-        polygonOptions.add(new LatLng(-23.584173, -46.659891));
-        polygonOptions.add(new LatLng(-23.584503, -46.659607));
-        polygonOptions.add(new LatLng(-23.583635, -46.658455));
-        polygonOptions.strokeWidth(0);
-        polygonOptions.fillColor(Color.argb(126,255, 255, 255));
-        mMap.addPolygon(polygonOptions);
-
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        this.locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        this.locationListener = new LocationListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker in Car").icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
+            public void onLocationChanged(@NonNull Location location) {
+                mMap.clear();
+                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(userLocation).title("Maker in you"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this.locationListener);
+        }
+        mMap.moveCamera(CameraUpdateFactory.zoomBy(15));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for (int permission : grantResults) {
+            if (permission == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.locationListener);
+                }
+            } else {
+                alertPermissions();
+            }
+        }
+    }
+
+
+    private void alertPermissions() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Permissões Negadas");
+        builder.setMessage("Para Utilizar o app é necessario aceitar as permições");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
             }
         });
-
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.add(new LatLng(-23.588945, -46.660781));
-                polylineOptions.add(latLng);
-                polylineOptions.color(Color.BLACK);
-                polylineOptions.width(10);
-                mMap.addPolyline(polylineOptions);
-            }
-        });
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ibirapuera, 15));
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
